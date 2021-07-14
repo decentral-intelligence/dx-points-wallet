@@ -1,25 +1,12 @@
-import logo from "./logo.svg";
 import "./App.css";
-import { Button } from "@material-ui/core";
+import { HashRouter as Router } from "react-router-dom";
+import { DefaultLayout } from "./app/layout/DefaultLayout";
+import { Routes } from "./app/navigation/Routes";
 
 export const App = () => (
-  <div className="App">
-    <header className="App-header">
-      <img src={logo} className="App-logo" alt="logo" />
-      <p>
-        Edit <code>src/App.js</code> and save to reload.
-      </p>
-      <a
-        className="App-link"
-        href="https://reactjs.org"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Learn React
-      </a>
-      <Button onClick={() => alert("Clicked")} variant="contained">
-        Some Text
-      </Button>
-    </header>
-  </div>
+  <Router>
+    <DefaultLayout>
+      <Routes />
+    </DefaultLayout>
+  </Router>
 );
