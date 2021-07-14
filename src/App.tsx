@@ -1,5 +1,6 @@
 import logo from "./logo.svg";
 import "./App.css";
+import { Button } from "@material-ui/core";
 
 export const App = () => (
   <div className="App">
@@ -16,6 +17,9 @@ export const App = () => (
       >
         Learn React
       </a>
+      <Button onClick={() => alert("Clicked")} variant="contained">
+        Some Text
+      </Button>
     </header>
   </div>
 );
