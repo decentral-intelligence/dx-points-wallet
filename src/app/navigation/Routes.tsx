@@ -1,7 +1,7 @@
 import { Route, Switch } from "react-router-dom";
 import { Dashboard } from "../../features/dashboard";
 import { Settings } from "../../features/settings";
-import { AccountView } from "../../features/account/view";
+import { AccountView } from "../../features/account";
 
 export const Routes = () => (
   <Switch>

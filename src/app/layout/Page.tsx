@@ -1,4 +1,5 @@
 import { makeStyles } from "@material-ui/core/styles";
+import { Container } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {},
@@ -7,5 +8,9 @@ const useStyles = makeStyles((theme) => ({
 export const Page: React.FC = ({ children }) => {
   const classes = useStyles();
 
-  return <div className={classes.root}>{children}</div>;
+  return (
+    <Container>
+      <div className={classes.root}>{children}</div>
+    </Container>
+  );
 };
