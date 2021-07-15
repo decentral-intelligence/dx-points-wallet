@@ -76,7 +76,7 @@ export const DefaultLayout: React.FC<Props> = ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Responsive drawer
+            DX Pointz Wallet
           </Typography>
         </Toolbar>
       </AppBar>

@@ -1,7 +1,7 @@
 import { Route, Switch } from "react-router-dom";
 import { Dashboard } from "../../features/dashboard";
 import { Settings } from "../../features/settings";
-import { AccountView } from "../../features/account";
+import { Account } from "../../features/account/Account";
 
 export const Routes = () => (
   <Switch>
@@ -9,7 +9,7 @@ export const Routes = () => (
       <Settings />
     </Route>
     <Route path="/account">
-      <AccountView />
+      <Account />
     </Route>
     <Route exact path="/">
       <Dashboard />
