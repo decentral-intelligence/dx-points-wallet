@@ -7,7 +7,7 @@ import { AccountImport } from "./import";
 import { AccountView } from "./view";
 
 const hasAccountsSelector = (state: AppState): boolean =>
-  Object.keys(state.persisted.accounts).length > 1;
+  Object.keys(state.persisted.accounts).length > 0;
 
 export const Account = () => {
   const { path } = useRouteMatch();

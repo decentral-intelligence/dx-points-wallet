@@ -9,6 +9,7 @@ interface Props {
 export const StepAddPublicKey: React.FC<Props> = ({ onChange, cryptoKey }) => (
   <StepAddCryptoKey
     cryptoKey={cryptoKey}
+    type="public"
     label="Public Key"
     description="Paste your public key here"
     onChange={onChange}

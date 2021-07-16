@@ -2,9 +2,11 @@ import Typography from "@material-ui/core/Typography";
 import { Box, TextField } from "@material-ui/core";
 import { useTheme } from "@material-ui/core/styles";
 import { FocusEvent, useState } from "react";
+import { validateCryptoKey } from "../../../../app/security/validateCryptoKey";
 
 interface Props {
   cryptoKey: string;
+  type: "private" | "public";
   label: string;
   description: string;
   onChange: (key: string, valid: boolean) => void;
@@ -12,17 +14,19 @@ interface Props {
 
 export const StepAddCryptoKey: React.FC<Props> = ({
   cryptoKey,
+  type,
   onChange,
   description,
   label,
 }) => {
   const theme = useTheme();
-  const [isInvalid, setIsInvalid] = useState<boolean>(false);
+  const [isValid, setIsValid] = useState<boolean>(true);
 
-  const onKeyChange = ({ target }: FocusEvent<HTMLInputElement>) => {
+  const onKeyChange = async ({ target }: FocusEvent<HTMLInputElement>) => {
     const key = target.value;
-    // TODO: validation of the key
-    onChange(key, true);
+    const isValid = await validateCryptoKey(key, type);
+    setIsValid(isValid);
+    onChange(key, isValid);
   };
 
   return (
@@ -35,8 +39,8 @@ export const StepAddCryptoKey: React.FC<Props> = ({
           multiline
           onChange={onKeyChange}
           value={cryptoKey}
-          helperText={isInvalid ? "Not a valid key" : " "}
-          error={isInvalid}
+          helperText={isValid ? " " : "Not a valid key"}
+          error={!isValid}
           fullWidth
         />
       </Box>

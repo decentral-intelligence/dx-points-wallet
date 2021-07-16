@@ -2,7 +2,8 @@ import { LocalStorage } from "../storage/LocalStorage";
 
 interface UserData {
   transactions: [];
-  balance: [];
+  balance: number;
+  alias?: string;
   settings: any;
 }
 
@@ -12,7 +13,8 @@ interface UserDictionary {
 
 interface PersistedAppState {
   theme: "dark" | "light";
-  nodeUrl: string;
+  peerUrl: string;
+  currentAccountId: string;
   accounts: UserDictionary;
 }
 
@@ -23,7 +25,8 @@ export interface AppState {
 
 const storage = new LocalStorage<PersistedAppState>({
   theme: "dark",
-  nodeUrl: "http://localhost:3001",
+  currentAccountId: "",
+  peerUrl: process.env.REACT_APP_BACKBONE_API || "http://localhost:3001",
   accounts: {},
 });
 
@@ -31,3 +34,5 @@ export const appState: AppState = {
   transient: {},
   persisted: storage.load(),
 };
+
+// TODO: see best way to store data (at best implicitely)

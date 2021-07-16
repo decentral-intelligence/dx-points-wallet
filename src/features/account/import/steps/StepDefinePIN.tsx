@@ -1,18 +1,18 @@
 import Typography from "@material-ui/core/Typography";
 import { Box, TextField } from "@material-ui/core";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { useTheme } from "@material-ui/core/styles";
 
 interface Props {
   pin: string;
-  onChange: (pin: string) => void;
+  onChange: (pin: string, isValid: boolean) => void;
 }
 
 export const StepDefinePIN: React.FC<Props> = ({ onChange, pin }) => {
   const theme = useTheme();
 
   const onPinChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    onChange(target.value);
+    onChange(target.value, target.value.length > 0);
   };
 
   return (

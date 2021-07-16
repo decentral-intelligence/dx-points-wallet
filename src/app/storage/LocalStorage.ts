@@ -1,4 +1,6 @@
-export class LocalStorage<TData> {
+import { Storage } from "./Storage";
+
+export class LocalStorage<TData> implements Storage<TData> {
   constructor(private initialData: TData, private key = "dxz") {}
 
   load(): TData {

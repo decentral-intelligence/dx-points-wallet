@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Stepper from "@material-ui/core/Stepper";
 import Button from "@material-ui/core/Button";
@@ -10,6 +10,12 @@ import { StepAddPublicKey } from "./steps/StepAddPublicKey";
 import { StepAddPrivateKey } from "./steps/StepAddPrivateKey";
 import { StepDefinePIN } from "./steps/StepDefinePIN";
 import { StepConfirmPIN } from "./steps/StepConfirmPIN";
+import { useLazyQuery } from "@apollo/client";
+import { SecureStorage } from "../../../app/storage/SecureStorage";
+import { KeyPairType } from "../../../app/security/keyPairType";
+import { useHistory } from "react-router-dom";
+import { AppContext } from "../../../app/contexts/AppContext";
+import { getAccountByPublicKeyQuery } from "../../../app/graphql/getAccountByPublicKey.query";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -35,8 +41,18 @@ function getStepLabels(): string[] {
   return ["Define a PIN", "Confirm PIN", "Add Public Key", "Add Private Key"];
 }
 
+const StepIndices = {
+  DefinePIN: 0,
+  ConfirmPIN: 1,
+  AddPublicKey: 2,
+  AddPrivateKey: 3,
+};
+
 export const AccountImport = () => {
+  const appContext = useContext(AppContext);
   const styles = useStyles();
+  const history = useHistory();
+  const [getAccount, { data }] = useLazyQuery(getAccountByPublicKeyQuery);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     pin: "",
@@ -45,21 +61,78 @@ export const AccountImport = () => {
     privateKey: "",
   });
 
-  const [canAdvance, setCanAdvance] = useState(true);
+  const [canAdvance, setCanAdvance] = useState(false);
+  const [hint, setHint] = useState({ text: "", error: false });
   const steps = getStepLabels();
+
+  useEffect(() => {
+    if (!data?.accountByPublicKey) return;
+
+    const { _id, alias } = data.accountByPublicKey;
+    if (!_id) {
+      setHint({
+        text: "No account exists for given public key!",
+        error: true,
+      });
+      return;
+    }
+
+    const aliasTxt = alias ? `(alias: ${alias})` : "";
+    setHint({
+      text: `Your Account: ${_id} ${aliasTxt}`,
+      error: false,
+    });
+  }, [data]);
+
+  useEffect(() => {
+    if (activeStep < StepIndices.AddPrivateKey) {
+      return;
+    }
+    getAccount({ variables: { publicKey: formData.publicKey } });
+  }, [activeStep, formData, getAccount]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) =>
       Math.min(prevActiveStep + 1, steps.length)
     );
+    setCanAdvance(false);
   };
 
   const handleBack = () => {
     setActiveStep((prevActiveStep) => Math.max(0, prevActiveStep - 1));
   };
 
+  const handleAccept = async () => {
+    const accountId = data?.accountByPublicKey?._id;
+
+    if (!accountId) {
+      console.warn("No account Id set");
+      return;
+    }
+
+    const { publicKey, privateKey, pin } = formData;
+    const storage = SecureStorage.create<KeyPairType>(pin, accountId);
+    await storage.save({ privateKey, publicKey });
+
+    appContext.persisted.currentAccountId = accountId;
+    appContext.persisted.accounts[accountId] = {
+      balance: data.accountByPublicKey.balance,
+      alias: data.accountByPublicKey.alias,
+      transactions: data.accountByPublicKey.transactions,
+      settings: {},
+    };
+
+    history.replace("/account");
+  };
+
   const handleReset = () => {
     setActiveStep(0);
+    setFormData({
+      pin: "",
+      confirmedPin: "",
+      publicKey: "",
+      privateKey: "",
+    });
   };
 
   const handleFormDataChange =
@@ -143,14 +216,31 @@ export const AccountImport = () => {
               </Step>
             ))}
           </Stepper>
-          {activeStep === steps.length && (
-            <Paper square elevation={0} className={styles.resetContainer}>
-              <Typography>All steps completed - you're finished</Typography>
-              <Button onClick={handleReset} className={styles.button}>
-                Reset
-              </Button>
-            </Paper>
-          )}
+          <Paper square elevation={0} className={styles.resetContainer}>
+            <Typography
+              color={hint.error ? "error" : "textPrimary"}
+              align="center"
+            >
+              {hint.text}
+            </Typography>
+            {activeStep === steps.length && (
+              <>
+                <Typography>All steps completed - you're finished</Typography>
+                <Button onClick={handleReset} className={styles.button}>
+                  Reset
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAccept}
+                  className={styles.button}
+                  disabled={hint.error}
+                >
+                  Accept
+                </Button>
+              </>
+            )}
+          </Paper>
         </div>
       </Box>
     </Page>

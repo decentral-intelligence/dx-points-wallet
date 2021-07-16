@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 interface LinkProps {
+  key: string;
   item: NavItem;
 }
 
@@ -49,7 +50,7 @@ export const DrawerMenu: React.FC = () => {
       <Divider />
       <List>
         {navigationItems.map((item, index) => (
-          <ListItemLink item={item} />
+          <ListItemLink key={item.label} item={item} />
         ))}
       </List>
     </div>
