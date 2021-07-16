@@ -1,21 +1,23 @@
 import Typography from "@material-ui/core/Typography";
 import { Box, TextField } from "@material-ui/core";
-import { FocusEvent, useState } from "react";
+import { FocusEvent } from "react";
 import { useTheme } from "@material-ui/core/styles";
 
 interface Props {
+  pin: string;
   targetPin: string;
-  onChange: (pin: string) => void;
+  onChange: (pin: string, isValid: boolean) => void;
 }
 
-export const StepConfirmPIN: React.FC<Props> = ({ targetPin, onChange }) => {
+export const StepConfirmPIN: React.FC<Props> = ({
+  pin,
+  targetPin,
+  onChange,
+}) => {
   const theme = useTheme();
-  const [pin, setPin] = useState<string>("");
 
   const onPinChange = ({ target }: FocusEvent<HTMLInputElement>) => {
-    const pin = target.value;
-    setPin(pin);
-    onChange(pin);
+    onChange(target.value, target.value === targetPin);
   };
 
   const isInvalid = targetPin.length > 0 && pin !== targetPin;
@@ -23,7 +25,8 @@ export const StepConfirmPIN: React.FC<Props> = ({ targetPin, onChange }) => {
   return (
     <form>
       <Typography variant="body2">
-        Now, confirm the previously entered PIN. Mind that the PIN
+        Now, confirm the previously entered PIN. Mind that the PIN is needed to
+        confirm your transactions
       </Typography>
       <Box marginTop={theme.spacing(0.25)} textAlign="center">
         <TextField

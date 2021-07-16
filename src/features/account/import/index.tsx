@@ -29,6 +29,8 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
+type FormDataField = "pin" | "confirmedPin" | "publicKey" | "privateKey";
+
 function getStepLabels(): string[] {
   return ["Define a PIN", "Confirm PIN", "Add Public Key", "Add Private Key"];
 }
@@ -36,11 +38,13 @@ function getStepLabels(): string[] {
 export const AccountImport = () => {
   const styles = useStyles();
   const [activeStep, setActiveStep] = useState(0);
-  const [pin, setPin] = useState("");
-  const [cryptoKeys, setCryptoKeys] = useState({
-    public: "",
-    private: "",
+  const [formData, setFormData] = useState({
+    pin: "",
+    confirmedPin: "",
+    publicKey: "",
+    privateKey: "",
   });
+
   const [canAdvance, setCanAdvance] = useState(true);
   const steps = getStepLabels();
 
@@ -58,19 +62,12 @@ export const AccountImport = () => {
     setActiveStep(0);
   };
 
-  const handlePinChange = (pin: string) => {
-    setPin(pin);
-  };
-
-  const handlePinConfirmChange = (confirmedPin: string) => {
-    setCanAdvance(confirmedPin === pin);
-  };
-
-  const handleCryptoKeyChange =
-    (type: "public" | "private") => (key: string, isValid: boolean) => {
-      setCryptoKeys({
-        ...cryptoKeys,
-        [type]: key,
+  const handleFormDataChange =
+    (field: FormDataField) =>
+    (key: string, isValid: boolean = true) => {
+      setFormData({
+        ...formData,
+        [field]: key,
       });
       setCanAdvance(isValid);
     };
@@ -78,16 +75,33 @@ export const AccountImport = () => {
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
-        return <StepDefinePIN onChange={handlePinChange} />;
+        return (
+          <StepDefinePIN
+            pin={formData.pin}
+            onChange={handleFormDataChange("pin")}
+          />
+        );
       case 1:
         return (
-          <StepConfirmPIN targetPin={pin} onChange={handlePinConfirmChange} />
+          <StepConfirmPIN
+            pin={formData.confirmedPin}
+            targetPin={formData.pin}
+            onChange={handleFormDataChange("confirmedPin")}
+          />
         );
       case 2:
-        return <StepAddPublicKey onChange={handleCryptoKeyChange("public")} />;
+        return (
+          <StepAddPublicKey
+            cryptoKey={formData.publicKey}
+            onChange={handleFormDataChange("publicKey")}
+          />
+        );
       case 3:
         return (
-          <StepAddPrivateKey onChange={handleCryptoKeyChange("private")} />
+          <StepAddPrivateKey
+            cryptoKey={formData.privateKey}
+            onChange={handleFormDataChange("privateKey")}
+          />
         );
       default:
         return "Unknown step";

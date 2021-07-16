@@ -4,23 +4,23 @@ import { useTheme } from "@material-ui/core/styles";
 import { FocusEvent, useState } from "react";
 
 interface Props {
+  cryptoKey: string;
   label: string;
   description: string;
   onChange: (key: string, valid: boolean) => void;
 }
 
 export const StepAddCryptoKey: React.FC<Props> = ({
+  cryptoKey,
   onChange,
   description,
   label,
 }) => {
   const theme = useTheme();
-  const [key, setKey] = useState<string>("");
   const [isInvalid, setIsInvalid] = useState<boolean>(false);
 
   const onKeyChange = ({ target }: FocusEvent<HTMLInputElement>) => {
     const key = target.value;
-    setKey(key);
     // TODO: validation of the key
     onChange(key, true);
   };
@@ -34,7 +34,7 @@ export const StepAddCryptoKey: React.FC<Props> = ({
           variant="filled"
           multiline
           onChange={onKeyChange}
-          value={key}
+          value={cryptoKey}
           helperText={isInvalid ? "Not a valid key" : " "}
           error={isInvalid}
           fullWidth

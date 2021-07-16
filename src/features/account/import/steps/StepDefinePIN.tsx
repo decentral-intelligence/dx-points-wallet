@@ -4,17 +4,15 @@ import { ChangeEvent, useState } from "react";
 import { useTheme } from "@material-ui/core/styles";
 
 interface Props {
+  pin: string;
   onChange: (pin: string) => void;
 }
 
-export const StepDefinePIN: React.FC<Props> = ({ onChange }) => {
+export const StepDefinePIN: React.FC<Props> = ({ onChange, pin }) => {
   const theme = useTheme();
-  const [pin, setPin] = useState<string>("");
 
   const onPinChange = ({ target }: ChangeEvent<HTMLInputElement>) => {
-    const pin = target.value;
-    setPin(pin);
-    onChange(pin);
+    onChange(target.value);
   };
 
   return (
