@@ -11,19 +11,19 @@ export const App = () => {
 
   const apolloClient = useMemo(() => {
     return new ApolloClient({
-      uri: appContext.persisted.peerUrl,
+      uri: appContext.persist.peerUrl,
       cache: new InMemoryCache(),
     });
-  }, [appContext.persisted.peerUrl]);
+  }, [appContext.persist.peerUrl]);
 
   const theme = React.useMemo(
     () =>
       createTheme({
         palette: {
-          type: appContext.persisted.theme,
+          type: appContext.persist.theme,
         },
       }),
-    [appContext.persisted.theme]
+    [appContext.persist.theme]
   );
 
   return (

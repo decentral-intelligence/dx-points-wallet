@@ -1,11 +1,11 @@
 import { Storage } from "./Storage";
 
-export class LocalStorage<TData> implements Storage<TData> {
-  constructor(private initialData: TData, private key = "dxz") {}
+export class LocalStorage<TData = unknown> implements Storage<TData> {
+  constructor(private initialData?: TData, private key = "dxz") {}
 
   load(): TData {
     const data = localStorage.getItem(this.key);
-    return data ? JSON.parse(data) : this.initialData;
+    return data ? JSON.parse(data) : this.initialData || {};
   }
 
   save(data: TData) {

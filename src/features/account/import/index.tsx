@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Stepper from "@material-ui/core/Stepper";
 import Button from "@material-ui/core/Button";
@@ -14,8 +14,8 @@ import { useLazyQuery } from "@apollo/client";
 import { SecureStorage } from "../../../app/storage/SecureStorage";
 import { KeyPairType } from "../../../app/security/keyPairType";
 import { useHistory } from "react-router-dom";
-import { AppContext } from "../../../app/contexts/AppContext";
 import { getAccountByPublicKeyQuery } from "../../../app/graphql/getAccountByPublicKey.query";
+import { usePersistedAppState } from "../../../app/hooks/usePersistedAppState";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,7 +49,7 @@ const StepIndices = {
 };
 
 export const AccountImport = () => {
-  const appContext = useContext(AppContext);
+  const [, setPersistAppState] = usePersistedAppState();
   const styles = useStyles();
   const history = useHistory();
   const [getAccount, { data }] = useLazyQuery(getAccountByPublicKeyQuery);
@@ -111,17 +111,22 @@ export const AccountImport = () => {
     }
 
     const { publicKey, privateKey, pin } = formData;
-    const storage = SecureStorage.create<KeyPairType>(pin, accountId);
+    const storage = SecureStorage.access<KeyPairType>(pin, accountId);
     await storage.save({ privateKey, publicKey });
 
-    appContext.persisted.currentAccountId = accountId;
-    appContext.persisted.accounts[accountId] = {
-      balance: data.accountByPublicKey.balance,
-      alias: data.accountByPublicKey.alias,
-      transactions: data.accountByPublicKey.transactions,
-      settings: {},
-    };
-
+    const { balance, alias, transactions } = data.accountByPublicKey;
+    setPersistAppState({
+      currentAccountId: accountId,
+      accounts: {
+        [accountId]: {
+          id: accountId,
+          balance,
+          alias,
+          transactions,
+          settings: {},
+        },
+      },
+    });
     history.replace("/account");
   };
 

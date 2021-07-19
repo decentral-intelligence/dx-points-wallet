@@ -8,7 +8,7 @@ export class SecureStorage<TData> implements Storage<TData> {
     this.vault = new CryptoStorage(passcode);
   }
 
-  static create<TData>(passcode: string, storeId: string) {
+  static access<TData>(passcode: string, storeId: string) {
     return new SecureStorage<TData>(passcode, storeId);
   }
 

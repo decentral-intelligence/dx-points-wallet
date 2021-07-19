@@ -1,38 +1,43 @@
 import { LocalStorage } from "../storage/LocalStorage";
+import { AccountData } from "../types/accountData";
 
-interface UserData {
-  transactions: [];
-  balance: number;
-  alias?: string;
-  settings: any;
+interface AccountsDictionary {
+  [key: string]: AccountData;
 }
 
-interface UserDictionary {
-  [key: string]: UserData;
-}
-
-interface PersistedAppState {
+export interface PersistedAppState {
   theme: "dark" | "light";
   peerUrl: string;
   currentAccountId: string;
-  accounts: UserDictionary;
+  accounts: AccountsDictionary;
 }
 
+// no type defined yet
+export interface TransientAppState {
+  isLoading: boolean;
+}
+
+// TODO: eventual bring secured app state into game
 export interface AppState {
-  transient: any;
-  persisted: PersistedAppState;
+  transient: TransientAppState;
+  persist: PersistedAppState;
 }
 
-const storage = new LocalStorage<PersistedAppState>({
-  theme: "dark",
-  currentAccountId: "",
-  peerUrl: process.env.REACT_APP_BACKBONE_API || "http://localhost:3001",
-  accounts: {},
+export const getInitialState = (): AppState => ({
+  transient: {
+    isLoading: false,
+  },
+  persist: {
+    theme: "dark",
+    currentAccountId: "",
+    peerUrl: process.env.REACT_APP_BACKBONE_API || "http://localhost:3001",
+    accounts: {},
+  },
 });
 
-export const appState: AppState = {
-  transient: {},
-  persisted: storage.load(),
-};
+const storage = new LocalStorage<PersistedAppState>(getInitialState().persist);
 
-// TODO: see best way to store data (at best implicitely)
+export const appState: AppState = {
+  ...getInitialState(),
+  persist: storage.load(),
+};

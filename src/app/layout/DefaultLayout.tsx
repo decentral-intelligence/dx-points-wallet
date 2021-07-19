@@ -9,6 +9,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DrawerMenu } from "./DrawerMenu";
+import { LinearProgress } from "@material-ui/core";
+import { useAppLoadingState } from "../hooks/useAppLoadingState";
 
 const drawerWidth = 240;
 
@@ -27,6 +29,12 @@ const useStyles = makeStyles((theme) => ({
       width: `calc(100% - ${drawerWidth}px)`,
       marginLeft: drawerWidth,
     },
+  },
+  loadingBar: {
+    position: "absolute",
+    left: 0,
+    top: 64,
+    width: "100%",
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -56,6 +64,7 @@ export const DefaultLayout: React.FC<Props> = ({
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [isLoading] = useAppLoadingState();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -111,6 +120,9 @@ export const DefaultLayout: React.FC<Props> = ({
       </nav>
       <main className={classes.content}>
         <div className={classes.toolbar} />
+        <div className={classes.loadingBar}>
+          {isLoading && <LinearProgress color="secondary" />}
+        </div>
         {children}
       </main>
     </div>

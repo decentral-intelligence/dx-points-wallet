@@ -1,10 +1,20 @@
 import { Page } from "../../app/layout/Page";
-import Typography from "@material-ui/core/Typography";
+import { BalanceCard } from "./BalanceCard";
+import { useHistory } from "react-router-dom";
+import { useCurrentAccountSelector } from "../../app/hooks/useCurrentAccountSelector";
 
 export const Dashboard = () => {
+  const history = useHistory();
+  const account = useCurrentAccountSelector();
+
+  if (!account) {
+    history.push("/account");
+    return null;
+  }
+
   return (
     <Page>
-      <Typography variant="h1">Home</Typography>
+      <BalanceCard account={account} />
     </Page>
   );
 };
