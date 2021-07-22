@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const getAccountByIdQuery = gql`
-  query getAccountById($id: ID!) {
-    account(id: $id) {
+export const getAccountByAliasQuery = gql`
+  query getAccountByAlias($alias: String!) {
+    accountByAlias(alias: $alias) {
       _id
       alias
       balance

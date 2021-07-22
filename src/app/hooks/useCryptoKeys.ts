@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { KeyPairType } from "../security/keyPairType";
 import { useAppSelector } from "../../hooks";
 import { accountSelector } from "../selectors/accountSelector";
-import { decryptCryptoKeys } from "../security/decryptCryptoKeys";
+import { decryptCryptoKeys } from "../security/secureCryptoKeys";
 
 export function useCryptoKeys(pin: string): [boolean, KeyPairType | null] {
   const account = useAppSelector(accountSelector);

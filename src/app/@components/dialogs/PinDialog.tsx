@@ -10,7 +10,7 @@ import { ChangeEvent, useState } from "react";
 import Typography from "@material-ui/core/Typography";
 import { useAppSelector } from "../../../hooks";
 import { accountSelector } from "../../selectors/accountSelector";
-import { decryptCryptoKeys } from "../../security/decryptCryptoKeys";
+import { decryptCryptoKeys } from "../../security/secureCryptoKeys";
 
 interface Props {
   onClose: () => void;

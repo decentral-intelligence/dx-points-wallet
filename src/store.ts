@@ -1,4 +1,4 @@
-import { combineReducers, configureStore, Middleware } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { appSlice } from "./app/state";
 import { accountSlice } from "./features/account/state";
 import { settingsSlice } from "./features/settings/state";

@@ -1,41 +1,45 @@
 import { useLazyQuery } from "@apollo/client";
 import { useEffect } from "react";
-import { getAccountById } from "../graphql/getAccountById.query";
-import { useAppSelector } from "../../hooks";
+import { getAccountByIdQuery } from "../graphql/getAccountById.query";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import { accountSelector } from "../selectors/accountSelector";
+import { accountSlice } from "../../features/account/state";
+import { AccountData } from "../types/accountData";
 
 export const AppInitializer = () => {
-  const [getAccount, { data }] = useLazyQuery(getAccountById, {
-    pollInterval: 10 * 1000,
-    fetchPolicy: "no-cache",
-    notifyOnNetworkStatusChange: true, // without that useEffect won't be triggered
-  });
+  const [getAccount, { data, stopPolling }] = useLazyQuery(
+    getAccountByIdQuery,
+    {
+      pollInterval: 10 * 1000,
+      fetchPolicy: "no-cache",
+      notifyOnNetworkStatusChange: true, // without that useEffect won't be triggered
+    }
+  );
   const currentAccount = useAppSelector(accountSelector);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (!currentAccount) return;
     getAccount({ variables: { id: currentAccount._id } });
-  }, [getAccount, currentAccount]);
+    return () => {
+      stopPolling && stopPolling();
+    };
+  }, []);
 
   useEffect(() => {
     if (!(currentAccount && data)) return;
-    // FIXME: do account update here!
-    //
-    // const settings = persistedAppState.accounts[currentAccount._id].settings;
-    // const { balance, alias, transactions } = data.account;
-    //
-    // setPersistedAppState({
-    //   accounts: {
-    //     [currentAccount._id]: {
-    //       _id: currentAccount._id,
-    //       alias,
-    //       balance,
-    //       settings,
-    //       transactions
-    //     }
-    //   }
-    // });
-  }, [currentAccount, data]);
+    const { balance, transactions } = data.account as AccountData;
+    if (balance !== currentAccount.balance) {
+      // balance change, no change at all!
+      dispatch(
+        accountSlice.actions.setAccount({
+          ...currentAccount,
+          transactions,
+          balance,
+        })
+      );
+    }
+  }, [currentAccount, data, dispatch]);
 
   return null;
 };

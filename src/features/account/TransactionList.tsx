@@ -44,7 +44,9 @@ export const TransactionList: React.FC<Props> = ({ account }) => {
         <TableBody>
           {transactions.map((t) => (
             <TableRow key={t._id}>
-              <TableCell>{t.timestamp}</TableCell>
+              <TableCell>
+                {new Date(parseInt(t.timestamp)).toLocaleString()}
+              </TableCell>
               <TableCell>{t.sender.alias || t.sender._id}</TableCell>
               <TableCell>{t.recipient.alias || t.recipient._id}</TableCell>
               <TableCell>{t.amount}</TableCell>

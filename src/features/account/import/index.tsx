@@ -15,7 +15,7 @@ import { StepConfirmPIN } from "./steps/StepConfirmPIN";
 import { getAccountByPublicKeyQuery } from "../../../app/graphql/getAccountByPublicKey.query";
 import { useAppDispatch } from "../../../hooks";
 import { actions } from "../state";
-import { encryptCryptoKeys } from "../../../app/security/encryptCryptoKeys";
+import { encryptCryptoKeys } from "../../../app/security/secureCryptoKeys";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

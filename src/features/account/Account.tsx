@@ -5,6 +5,7 @@ import { AccountImport } from "./import";
 import { AccountView } from "./view";
 import { useAppSelector } from "../../hooks";
 import { RootState } from "../../store";
+import { TransferView } from "./transfer";
 
 const hasAccountsSelector = (state: RootState): boolean => !!state.account?._id;
 
@@ -19,6 +20,9 @@ export const Account = () => {
         </Route>
         <Route exact path={`${path}/import`}>
           <AccountImport />
+        </Route>
+        <Route exact path={`${path}/transfer`}>
+          <TransferView />
         </Route>
       </Switch>
     </Page>

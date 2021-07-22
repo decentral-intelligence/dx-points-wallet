@@ -29,6 +29,10 @@ export const BalanceCard: React.FC<Props> = ({ account }) => {
     history.push("/account");
   };
 
+  const handleTransferPoints = () => {
+    history.push("/account/transfer");
+  };
+
   return (
     <Card className={classes.root}>
       <CardContent>
@@ -50,7 +54,7 @@ export const BalanceCard: React.FC<Props> = ({ account }) => {
         <Button
           size="small"
           variant="contained"
-          onClick={handleSeeDetails}
+          onClick={handleTransferPoints}
           disabled={account.balance === 0}
         >
           Transfer Points
