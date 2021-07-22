@@ -1,21 +1,21 @@
 import { useState, useEffect } from "react";
 import { KeyPairType } from "../security/keyPairType";
-import { SecureStorage } from "../storage/SecureStorage";
+import { useAppSelector } from "../../hooks";
+import { accountSelector } from "../selectors/accountSelector";
+import { decryptCryptoKeys } from "../security/decryptCryptoKeys";
 
-export function useCryptoKeysSelector(
-  pin: string,
-  userId: string
-): [boolean, KeyPairType | null] {
+export function useCryptoKeys(pin: string): [boolean, KeyPairType | null] {
+  const account = useAppSelector(accountSelector);
   const [loading, setLoading] = useState(false);
   const [keyPair, setKeyPair] = useState<KeyPairType | null>(null);
   useEffect(() => {
     const fetchKeys = async () => {
       try {
         setLoading(true);
-        const keypair = await SecureStorage.access<KeyPairType>(
+        const keypair = await decryptCryptoKeys(
           pin,
-          userId
-        ).load();
+          account?.securedKeys || ""
+        );
         setKeyPair(keypair);
       } catch (e) {
         console.error(e);
@@ -24,10 +24,10 @@ export function useCryptoKeysSelector(
       }
     };
 
-    if (pin && userId) {
+    if (pin) {
       fetchKeys();
     }
-  }, [pin, userId]);
+  }, [pin]);
 
   return [loading, keyPair];
 }

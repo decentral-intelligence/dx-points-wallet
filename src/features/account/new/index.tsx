@@ -1,4 +1,4 @@
-import { Page } from "../../../app/layout/Page";
+import { Page } from "../../../app/@components/layout/Page";
 import Typography from "@material-ui/core/Typography";
 
 export const AccountView = () => {

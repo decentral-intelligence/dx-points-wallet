@@ -1,11 +1,12 @@
-import { Page } from "../../app/layout/Page";
-import { BalanceCard } from "./BalanceCard";
+import { Page } from "../../app/@components/layout/Page";
 import { useHistory } from "react-router-dom";
-import { useCurrentAccountSelector } from "../../app/hooks/useCurrentAccountSelector";
+import { BalanceCard } from "../../app/@components/BalanceCard";
+import { useAppSelector } from "../../hooks";
+import { accountSelector } from "../../app/selectors/accountSelector";
 
 export const Dashboard = () => {
   const history = useHistory();
-  const account = useCurrentAccountSelector();
+  const account = useAppSelector(accountSelector);
 
   if (!account) {
     history.push("/account");

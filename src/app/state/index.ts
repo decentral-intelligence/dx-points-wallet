@@ -1,43 +1,24 @@
-import { LocalStorage } from "../storage/LocalStorage";
-import { AccountData } from "../types/accountData";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface AccountsDictionary {
-  [key: string]: AccountData;
-}
+const initialState = {
+  isLoading: 0,
+};
 
-export interface PersistedAppState {
-  theme: "dark" | "light";
-  peerUrl: string;
-  currentAccountId: string;
-  accounts: AccountsDictionary;
-}
-
-// no type defined yet
-export interface TransientAppState {
-  isLoading: boolean;
-}
-
-// TODO: eventual bring secured app state into game
-export interface AppState {
-  transient: TransientAppState;
-  persist: PersistedAppState;
-}
-
-export const getInitialState = (): AppState => ({
-  transient: {
-    isLoading: false,
-  },
-  persist: {
-    theme: "dark",
-    currentAccountId: "",
-    peerUrl: process.env.REACT_APP_BACKBONE_API || "http://localhost:3001",
-    accounts: {},
+export const appSlice = createSlice({
+  name: "app",
+  initialState,
+  reducers: {
+    setLoading: (state, action: PayloadAction<boolean>) => {
+      state.isLoading = action.payload
+        ? state.isLoading + 1
+        : Math.max(0, state.isLoading - 1);
+    },
+    reset: () => {
+      // triggers a middleware
+      return initialState;
+    },
   },
 });
 
-const storage = new LocalStorage<PersistedAppState>(getInitialState().persist);
-
-export const appState: AppState = {
-  ...getInitialState(),
-  persist: storage.load(),
-};
+export const actions = appSlice.actions;
+export const reducer = appSlice.reducer;

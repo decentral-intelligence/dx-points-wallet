@@ -1,43 +1,29 @@
-import { Page } from "../../app/layout/Page";
 import Typography from "@material-ui/core/Typography";
 import { Button, useTheme } from "@material-ui/core";
 import Box from "@material-ui/core/Box";
-import { SecureStorage } from "../../app/storage/SecureStorage";
 import { useState } from "react";
-import { usePersistedAppState } from "../../app/hooks/usePersistedAppState";
 import { useHistory } from "react-router-dom";
-import { PinDialog } from "../../app/dialogs/PinDialog";
-import { useTransientAppState } from "../../app/hooks/useTransientAppState";
 import { useAppLoadingState } from "../../app/hooks/useAppLoadingState";
+import { Page } from "../../app/@components/layout/Page";
+import { PinDialog } from "../../app/@components/dialogs/PinDialog";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { accountSelector } from "../../app/selectors/accountSelector";
+import { appSlice } from "../../app/state";
 
 export const Settings = () => {
   const theme = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [, setIsLoading] = useAppLoadingState();
-  const [persistState, setPersistAppState] = usePersistedAppState();
-  const [, setTransientState] = useTransientAppState();
+  const account = useAppSelector(accountSelector);
   const history = useHistory();
+  const dispatch = useAppDispatch();
 
   const resetData = async (pin: string) => {
-    try {
-      setIsLoading(true);
-      if (pin) {
-        (
-          await SecureStorage.access(pin, persistState.currentAccountId)
-        ).clear();
-      }
-      setPersistAppState(null);
-      setTransientState(null);
-      history.replace("/");
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(appSlice.actions.reset());
+    history.replace("/");
   };
 
   const handleResetData = async () => {
-    if (persistState.currentAccountId) {
+    if (account?._id) {
       setDialogOpen(true);
     } else {
       await resetData("");

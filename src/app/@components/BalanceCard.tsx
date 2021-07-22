@@ -6,7 +6,7 @@ import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import { useHistory } from "react-router-dom";
-import { AccountData } from "../../app/types/accountData";
+import { AccountData } from "../types/accountData";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,11 +32,11 @@ export const BalanceCard: React.FC<Props> = ({ account }) => {
   return (
     <Card className={classes.root}>
       <CardContent>
-        <Typography color="textSecondary" variant="h6">
-          {account.id}
-        </Typography>
-        <Typography color="textSecondary" variant="subtitle2" gutterBottom>
+        <Typography color="textSecondary" variant="h5" gutterBottom>
           {`${account.alias}`}
+        </Typography>
+        <Typography color="textSecondary" variant="subtitle2">
+          {account._id}
         </Typography>
         <Typography
           className={classes.balance}

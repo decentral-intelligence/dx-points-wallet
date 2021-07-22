@@ -8,10 +8,9 @@ import {
 import Button from "@material-ui/core/Button";
 import { ChangeEvent, useState } from "react";
 import Typography from "@material-ui/core/Typography";
-import { SecureStorage } from "../storage/SecureStorage";
-import { AppState } from "../state";
-import { useAppStateSelector } from "../hooks/useAppStateSelector";
-import { KeyPairType } from "../security/keyPairType";
+import { useAppSelector } from "../../../hooks";
+import { accountSelector } from "../../selectors/accountSelector";
+import { decryptCryptoKeys } from "../../security/decryptCryptoKeys";
 
 interface Props {
   onClose: () => void;
@@ -19,19 +18,16 @@ interface Props {
   open: boolean;
 }
 
-const selectCurrentAccount = (state: AppState): string =>
-  state.persist.currentAccountId;
-
 export const PinDialog: React.FC<Props> = ({ open, onClose, onCorrectPin }) => {
   const [pin, setPin] = useState("");
   const [invalidPin, setInvalidPin] = useState(false);
+  const account = useAppSelector(accountSelector);
 
-  const accountId = useAppStateSelector(selectCurrentAccount);
+  if (!account) return null;
 
   const handleConfirm = async () => {
     try {
-      const secureStorage = SecureStorage.access<KeyPairType>(pin, accountId);
-      const { privateKey } = await secureStorage.load();
+      const { privateKey } = await decryptCryptoKeys(pin, account.securedKeys);
       onCorrectPin(pin, privateKey);
     } catch (e) {
       setInvalidPin(true);

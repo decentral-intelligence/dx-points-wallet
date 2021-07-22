@@ -1,16 +1,23 @@
-import { Page } from "../../../app/layout/Page";
-import Typography from "@material-ui/core/Typography";
-import { useCurrentAccountSelector } from "../../../app/hooks/useCurrentAccountSelector";
+import { Page } from "../../../app/@components/layout/Page";
+import { BalanceCard } from "../../../app/@components/BalanceCard";
+import { TransactionList } from "../TransactionList";
+import Box from "@material-ui/core/Box";
+import { useTheme } from "@material-ui/core/styles";
+import { useAppSelector } from "../../../hooks";
+import { accountSelector } from "../../../app/selectors/accountSelector";
 
 export const AccountView = () => {
-  const account = useCurrentAccountSelector();
+  const theme = useTheme();
+  const account = useAppSelector(accountSelector);
   if (!account) return null;
   return (
     <Page>
-      <Typography variant="h2">View Account</Typography>
-      <Typography variant="h4">{account.id}</Typography>
-      <Typography variant="h4">{account.alias}</Typography>
-      <Typography variant="h4">{account.balance}</Typography>
+      <Box margin={theme.spacing(1)}>
+        <BalanceCard account={account} />
+      </Box>
+      <Box>
+        <TransactionList account={account} />
+      </Box>
     </Page>
   );
 };

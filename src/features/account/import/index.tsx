@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
+import { useLazyQuery } from "@apollo/client";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import { Box, Step, StepContent, StepLabel } from "@material-ui/core";
 import Stepper from "@material-ui/core/Stepper";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import { Page } from "../../../app/layout/Page";
+import { Page } from "../../../app/@components/layout/Page";
 import Typography from "@material-ui/core/Typography";
-import { Box, Step, StepContent, StepLabel } from "@material-ui/core";
 import { StepAddPublicKey } from "./steps/StepAddPublicKey";
 import { StepAddPrivateKey } from "./steps/StepAddPrivateKey";
 import { StepDefinePIN } from "./steps/StepDefinePIN";
 import { StepConfirmPIN } from "./steps/StepConfirmPIN";
-import { useLazyQuery } from "@apollo/client";
-import { SecureStorage } from "../../../app/storage/SecureStorage";
-import { KeyPairType } from "../../../app/security/keyPairType";
-import { useHistory } from "react-router-dom";
 import { getAccountByPublicKeyQuery } from "../../../app/graphql/getAccountByPublicKey.query";
-import { usePersistedAppState } from "../../../app/hooks/usePersistedAppState";
+import { useAppDispatch } from "../../../hooks";
+import { actions } from "../state";
+import { encryptCryptoKeys } from "../../../app/security/encryptCryptoKeys";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,7 +49,7 @@ const StepIndices = {
 };
 
 export const AccountImport = () => {
-  const [, setPersistAppState] = usePersistedAppState();
+  const dispatch = useAppDispatch();
   const styles = useStyles();
   const history = useHistory();
   const [getAccount, { data }] = useLazyQuery(getAccountByPublicKeyQuery);
@@ -109,24 +109,18 @@ export const AccountImport = () => {
       console.warn("No account Id set");
       return;
     }
-
     const { publicKey, privateKey, pin } = formData;
-    const storage = SecureStorage.access<KeyPairType>(pin, accountId);
-    await storage.save({ privateKey, publicKey });
-
-    const { balance, alias, transactions } = data.accountByPublicKey;
-    setPersistAppState({
-      currentAccountId: accountId,
-      accounts: {
-        [accountId]: {
-          id: accountId,
-          balance,
-          alias,
-          transactions,
-          settings: {},
-        },
-      },
-    });
+    const { balance, alias, transactions, _id } = data.accountByPublicKey;
+    const securedKeys = await encryptCryptoKeys(pin, { privateKey, publicKey });
+    dispatch(
+      actions.setAccount({
+        _id,
+        securedKeys,
+        alias,
+        transactions,
+        balance,
+      })
+    );
     history.replace("/account");
   };
 

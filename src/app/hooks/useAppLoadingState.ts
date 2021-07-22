@@ -1,19 +1,20 @@
-import { useContext } from "react";
-import { AppContext } from "../contexts/AppContext";
-import { TransientAppState } from "../state";
+import { useAppDispatch, useAppSelector } from "../../hooks";
+import { ThunkDispatch } from "@reduxjs/toolkit";
+import { actions } from "../state";
 
 type LoadingStateSetter = (isLoading: boolean) => void;
 
-let pendingCount = 0;
-
-function setLoadingState(transientState: TransientAppState) {
+function setLoadingState(
+  isLoadingCount: number,
+  dispatch: ThunkDispatch<any, any, any>
+) {
   return function (isLoading: boolean) {
-    pendingCount += isLoading ? 1 : -1;
-    transientState.isLoading = pendingCount > 0;
+    dispatch(actions.setLoading(isLoading));
   };
 }
 
 export function useAppLoadingState(): [boolean, LoadingStateSetter] {
-  const { transient } = useContext(AppContext);
-  return [transient.isLoading, setLoadingState(transient)];
+  const isLoading = useAppSelector((s) => s.app.isLoading);
+  const dispatch = useAppDispatch();
+  return [isLoading > 0, setLoadingState(isLoading, dispatch)];
 }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
@@ -10,7 +10,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DrawerMenu } from "./DrawerMenu";
 import { LinearProgress } from "@material-ui/core";
-import { useAppLoadingState } from "../hooks/useAppLoadingState";
+import { useAppLoadingState } from "../../hooks/useAppLoadingState";
 
 const drawerWidth = 240;
 
@@ -63,7 +63,7 @@ export const DefaultLayout: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
   const theme = useTheme();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoading] = useAppLoadingState();
 
   const handleDrawerToggle = () => {

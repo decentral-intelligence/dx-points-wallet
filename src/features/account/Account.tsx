@@ -1,17 +1,16 @@
 import { Switch, Route, useRouteMatch } from "react-router-dom";
-import { useAppStateSelector } from "../../app/hooks/useAppStateSelector";
-import { AppState } from "../../app/state";
-import { Page } from "../../app/layout/Page";
+import { Page } from "../../app/@components/layout/Page";
 import { NoAccounts } from "./NoAccounts";
 import { AccountImport } from "./import";
 import { AccountView } from "./view";
+import { useAppSelector } from "../../hooks";
+import { RootState } from "../../store";
 
-const hasAccountsSelector = (state: AppState): boolean =>
-  Object.keys(state.persist.accounts).length > 0;
+const hasAccountsSelector = (state: RootState): boolean => !!state.account?._id;
 
 export const Account = () => {
   const { path } = useRouteMatch();
-  const hasAccounts = useAppStateSelector(hasAccountsSelector);
+  const hasAccounts = useAppSelector(hasAccountsSelector);
   return (
     <Page>
       <Switch>
