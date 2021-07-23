@@ -19,8 +19,8 @@ export const StepDefinePIN: React.FC<Props> = ({ onChange, pin }) => {
     <form>
       <Typography variant="body2">
         Please define an alphanumeric PIN, which will be used to protect your
-        keys. Each time you do a transaction you will be asked to enter the PIN.
-        If you lost your PIN you can re-import your accounts
+        account. Each time you do a transaction you will be asked to enter the
+        PIN. If you lost your PIN you can re-import your accounts
       </Typography>
       <Box marginTop={theme.spacing(0.25)} textAlign="center">
         <TextField

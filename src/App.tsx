@@ -10,12 +10,15 @@ import { AppInitializer } from "./app/@components/AppInitializer";
 import { useAppSelector } from "./hooks";
 import { RootState } from "./store";
 import { ThemeType } from "./app/types";
+import { LoginLayout } from "./app/@components/layout/LoginLayout";
+import { useLoggedUser } from "./app/hooks/useLoggedUser";
 
 const themeSelector = (s: RootState): ThemeType =>
   s.settings[s.account._id]?.theme || "dark";
 
 export const App = () => {
   const userTheme = useAppSelector(themeSelector);
+  const loggedUser = useLoggedUser();
 
   const apolloClient = useMemo(() => {
     return new ApolloClient({
@@ -39,19 +42,23 @@ export const App = () => {
       <ApolloProvider client={apolloClient}>
         <AppInitializer />
         <Router>
-          <DefaultLayout>
-            <Switch>
-              <Route path="/settings">
-                <Settings />
-              </Route>
-              <Route path="/account">
-                <Account />
-              </Route>
-              <Route exact path="/">
-                <Dashboard />
-              </Route>
-            </Switch>
-          </DefaultLayout>
+          {loggedUser ? (
+            <DefaultLayout>
+              <Switch>
+                <Route path="/settings">
+                  <Settings />
+                </Route>
+                <Route path="/account">
+                  <Account />
+                </Route>
+                <Route exact path="/">
+                  <Dashboard />
+                </Route>
+              </Switch>
+            </DefaultLayout>
+          ) : (
+            <LoginLayout />
+          )}
         </Router>
       </ApolloProvider>
     </ThemeProvider>

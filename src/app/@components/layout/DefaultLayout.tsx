@@ -5,12 +5,16 @@ import Drawer from "@material-ui/core/Drawer";
 import Hidden from "@material-ui/core/Hidden";
 import IconButton from "@material-ui/core/IconButton";
 import MenuIcon from "@material-ui/icons/Menu";
+import LogoutIcon from "@material-ui/icons/ExitToApp";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import { DrawerMenu } from "./DrawerMenu";
 import { LinearProgress } from "@material-ui/core";
 import { useAppLoadingState } from "../../hooks/useAppLoadingState";
+import { useGoogleLogout } from "react-google-login";
+import { appSlice } from "../../state";
+import { useAppDispatch } from "../../../hooks";
 
 const drawerWidth = 240;
 
@@ -42,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
       display: "none",
     },
   },
+  title: {
+    flexGrow: 1,
+  },
   // necessary for content to be below app bar
   toolbar: theme.mixins.toolbar,
   drawerPaper: {
@@ -50,6 +57,9 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     padding: theme.spacing(3),
+    [theme.breakpoints.down("sm")]: {
+      padding: 0,
+    },
   },
 }));
 
@@ -63,8 +73,18 @@ export const DefaultLayout: React.FC<Props> = ({
 }) => {
   const classes = useStyles();
   const theme = useTheme();
+  const dispatch = useAppDispatch();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isLoading] = useAppLoadingState();
+
+  const handleSuccessfulLogout = () => {
+    dispatch(appSlice.actions.reset());
+  };
+
+  const { signOut } = useGoogleLogout({
+    clientId: process.env.REACT_APP_GOOGLE_CLIENT_ID || "",
+    onLogoutSuccess: handleSuccessfulLogout,
+  });
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -84,9 +104,12 @@ export const DefaultLayout: React.FC<Props> = ({
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap>
+          <Typography variant="h6" noWrap className={classes.title}>
             DX Pointz Wallet
           </Typography>
+          <IconButton color="inherit" onClick={signOut}>
+            <LogoutIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <nav className={classes.drawer} aria-label="mailbox folders">

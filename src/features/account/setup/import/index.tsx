@@ -6,16 +6,16 @@ import { Box, Step, StepContent, StepLabel } from "@material-ui/core";
 import Stepper from "@material-ui/core/Stepper";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import { Page } from "../../../app/@components/layout/Page";
+import { Page } from "../../../../app/@components/layout/Page";
 import Typography from "@material-ui/core/Typography";
-import { StepAddPublicKey } from "./steps/StepAddPublicKey";
-import { StepAddPrivateKey } from "./steps/StepAddPrivateKey";
-import { StepDefinePIN } from "./steps/StepDefinePIN";
-import { StepConfirmPIN } from "./steps/StepConfirmPIN";
-import { getAccountByPublicKeyQuery } from "../../../app/graphql/getAccountByPublicKey.query";
-import { useAppDispatch } from "../../../hooks";
-import { actions } from "../state";
-import { encryptCryptoKeys } from "../../../app/security/secureCryptoKeys";
+import { StepAddPublicKey } from "../steps/StepAddPublicKey";
+import { StepAddPrivateKey } from "../steps/StepAddPrivateKey";
+import { StepDefinePIN } from "../steps/StepDefinePIN";
+import { StepConfirmPIN } from "../steps/StepConfirmPIN";
+import { getAccountByPublicKeyQuery } from "../../../../app/graphql/getAccountByPublicKey.query";
+import { useAppDispatch } from "../../../../hooks";
+import { actions } from "../../state";
+import { encryptCryptoKeys } from "../../../../app/security/secureCryptoKeys";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({

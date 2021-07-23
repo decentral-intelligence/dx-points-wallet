@@ -7,7 +7,7 @@ import { accountSlice } from "../../features/account/state";
 import { AccountData } from "../types/accountData";
 
 export const AppInitializer = () => {
-  const [getAccount, { data, stopPolling }] = useLazyQuery(
+  const [getAccount, { data, stopPolling, error }] = useLazyQuery(
     getAccountByIdQuery,
     {
       pollInterval: 10 * 1000,
@@ -27,10 +27,10 @@ export const AppInitializer = () => {
   }, []);
 
   useEffect(() => {
-    if (!(currentAccount && data)) return;
+    if (!(currentAccount && data?.account)) return;
     const { balance, transactions } = data.account as AccountData;
+    // if balance don't change, no change at all!
     if (balance !== currentAccount.balance) {
-      // balance change, no change at all!
       dispatch(
         accountSlice.actions.setAccount({
           ...currentAccount,
@@ -40,6 +40,12 @@ export const AppInitializer = () => {
       );
     }
   }, [currentAccount, data, dispatch]);
+
+  useEffect(() => {
+    if (error?.message.indexOf("Failed to fetch") !== -1) {
+      console.log("Peer not reachable");
+    }
+  }, [error]);
 
   return null;
 };

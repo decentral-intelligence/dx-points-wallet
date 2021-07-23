@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 const initialState = {
   isLoading: 0,
+  loggedUser: "", // email
 };
 
 export const appSlice = createSlice({
@@ -12,6 +13,9 @@ export const appSlice = createSlice({
       state.isLoading = action.payload
         ? state.isLoading + 1
         : Math.max(0, state.isLoading - 1);
+    },
+    setLoggedUser: (state, action: PayloadAction<string>) => {
+      state.loggedUser = action.payload;
     },
     reset: () => {
       // triggers a middleware

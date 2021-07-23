@@ -1,7 +1,8 @@
 import { Switch, Route, useRouteMatch } from "react-router-dom";
 import { Page } from "../../app/@components/layout/Page";
 import { NoAccounts } from "./NoAccounts";
-import { AccountImport } from "./import";
+import { AccountImport } from "./setup/import";
+import { AccountCreate } from "./setup/create";
 import { AccountView } from "./view";
 import { useAppSelector } from "../../hooks";
 import { RootState } from "../../store";
@@ -20,6 +21,9 @@ export const Account = () => {
         </Route>
         <Route exact path={`${path}/import`}>
           <AccountImport />
+        </Route>
+        <Route exact path={`${path}/create`}>
+          <AccountCreate />
         </Route>
         <Route exact path={`${path}/transfer`}>
           <TransferView />
