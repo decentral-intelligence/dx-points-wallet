@@ -13,6 +13,11 @@ import { useAppDispatch } from "../../../../hooks";
 import { useAppLoadingState } from "../../../../app/hooks/useAppLoadingState";
 import { StepCreateAccount } from "../steps/StepCreateAccount";
 import { useLoggedUser } from "../../../../app/hooks/useLoggedUser";
+import { useMutation } from "@apollo/client";
+import { transferPointsMutation } from "../../../../app/graphql/transferPoints.mutation";
+import { createAccountMutation } from "../../../../app/graphql/createAccount.mutation";
+import { encryptCryptoKeys } from "../../../../app/security/secureCryptoKeys";
+import { accountSlice } from "../../state";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -32,7 +37,7 @@ const useStyles = makeStyles((theme: Theme) =>
   })
 );
 
-type FormDataField = "pin" | "confirmedPin" | "publicKey" | "privateKey";
+type FormDataField = "pin" | "confirmedPin" | "keys";
 
 function getStepLabels(): string[] {
   return ["Define a PIN", "Confirm PIN", "Create Account"];
@@ -45,19 +50,54 @@ const StepIndices = {
 };
 
 export const AccountCreate = () => {
-  const dispatch = useAppDispatch();
-  const loggedUser = useLoggedUser();
   const styles = useStyles();
+  const dispatch = useAppDispatch();
   const history = useHistory();
+  const loggedUser = useLoggedUser();
+  const [createAccount, { error, data }] = useMutation(createAccountMutation);
   const [, setAppLoading] = useAppLoadingState();
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
     pin: "",
     confirmedPin: "",
+    keys: { publicKey: "", privateKey: "" },
   });
   const [canAdvance, setCanAdvance] = useState(false);
+  // TODO: use setHint
   const [hint, setHint] = useState({ text: "", error: false });
   const steps = getStepLabels();
+
+  useEffect(() => {
+    const accountId = data?.createAccount?._id;
+
+    if (!accountId) {
+      console.warn("No account Id set");
+      setAppLoading(false);
+      return;
+    }
+
+    async function updateAccount() {
+      const { balance, alias, transactions, _id } = data.createAccount;
+      const securedKeys = await encryptCryptoKeys(formData.pin, formData.keys);
+      dispatch(
+        accountSlice.actions.setAccount({
+          _id,
+          securedKeys,
+          alias,
+          transactions,
+          balance,
+        })
+      );
+      history.replace("/");
+    }
+
+    updateAccount();
+    setAppLoading(false);
+  }, [data]);
+
+  useEffect(() => {
+    error && setAppLoading(false);
+  }, [error]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) =>
@@ -70,26 +110,15 @@ export const AccountCreate = () => {
     setActiveStep((prevActiveStep) => Math.max(0, prevActiveStep - 1));
   };
 
-  const handleAccept = async () => {
-    // const accountId = data?.accountByPublicKey?._id;
-    //
-    // if (!accountId) {
-    //   console.warn("No account Id set");
-    //   return;
-    // }
-    // const { publicKey, privateKey, pin } = formData;
-    // const { balance, alias, transactions, _id } = data.accountByPublicKey;
-    // const securedKeys = await encryptCryptoKeys(pin, { privateKey, publicKey });
-    // dispatch(
-    //   actions.setAccount({
-    //     _id,
-    //     securedKeys,
-    //     alias,
-    //     transactions,
-    //     balance,
-    //   })
-    // );
-    // history.replace("/account");
+  const handleCreate = async () => {
+    setAppLoading(true);
+    const args = {
+      publicKey: formData.keys.publicKey,
+      alias: loggedUser,
+      // TODO: see if we want allow Admin users also :shrug
+      role: "Common",
+    };
+    createAccount({ variables: { args } });
   };
 
   const handleReset = () => {
@@ -97,15 +126,16 @@ export const AccountCreate = () => {
     setFormData({
       pin: "",
       confirmedPin: "",
+      keys: { publicKey: "", privateKey: "" },
     });
   };
 
   const handleFormDataChange =
     (field: FormDataField) =>
-    (key: string, isValid: boolean = true) => {
+    (value: any, isValid: boolean = true) => {
       setFormData({
         ...formData,
-        [field]: key,
+        [field]: value,
       });
       setCanAdvance(isValid);
     };
@@ -131,7 +161,7 @@ export const AccountCreate = () => {
         return (
           <StepCreateAccount
             alias={loggedUser || ""}
-            onChange={setCanAdvance}
+            onChange={handleFormDataChange("keys")}
           />
         );
       default:
@@ -190,11 +220,11 @@ export const AccountCreate = () => {
                 <Button
                   variant="contained"
                   color="primary"
-                  onClick={handleAccept}
+                  onClick={handleCreate}
                   className={styles.button}
                   disabled={hint.error}
                 >
-                  Accept
+                  Create
                 </Button>
               </>
             )}

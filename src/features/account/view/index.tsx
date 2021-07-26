@@ -3,12 +3,11 @@ import { BalanceCard } from "../../../app/@components/BalanceCard";
 import { TransactionList } from "../TransactionList";
 import Box from "@material-ui/core/Box";
 import { useTheme } from "@material-ui/core/styles";
-import { useAppSelector } from "../../../hooks";
-import { accountSelector } from "../../../app/selectors/accountSelector";
+import { useCurrentAccount } from "../../../app/hooks/useCurrentAccount";
 
 export const AccountView = () => {
   const theme = useTheme();
-  const account = useAppSelector(accountSelector);
+  const account = useCurrentAccount();
   if (!account) return null;
   return (
     <Page>

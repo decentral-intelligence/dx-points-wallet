@@ -78,7 +78,7 @@ export const DefaultLayout: React.FC<Props> = ({
   const [isLoading] = useAppLoadingState();
 
   const handleSuccessfulLogout = () => {
-    dispatch(appSlice.actions.reset());
+    dispatch(appSlice.actions.logout());
   };
 
   const { signOut } = useGoogleLogout({

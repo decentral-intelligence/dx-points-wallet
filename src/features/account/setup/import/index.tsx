@@ -16,6 +16,7 @@ import { getAccountByPublicKeyQuery } from "../../../../app/graphql/getAccountBy
 import { useAppDispatch } from "../../../../hooks";
 import { actions } from "../../state";
 import { encryptCryptoKeys } from "../../../../app/security/secureCryptoKeys";
+import { useLoggedUser } from "../../../../app/hooks/useLoggedUser";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -48,10 +49,11 @@ const StepIndices = {
   AddPrivateKey: 3,
 };
 
-export const AccountImport = () => {
+export const AccountImport: React.FC = () => {
   const dispatch = useAppDispatch();
   const styles = useStyles();
   const history = useHistory();
+  const loggedUser = useLoggedUser();
   const [getAccount, { data }] = useLazyQuery(getAccountByPublicKeyQuery);
   const [activeStep, setActiveStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -72,6 +74,14 @@ export const AccountImport = () => {
     if (!_id) {
       setHint({
         text: "No account exists for given public key!",
+        error: true,
+      });
+      return;
+    }
+
+    if (loggedUser !== alias) {
+      setHint({
+        text: "Wrong user account!",
         error: true,
       });
       return;
@@ -183,6 +193,7 @@ export const AccountImport = () => {
   return (
     <Page>
       <Typography variant="h2">Import Account</Typography>
+      <Box>{`Welcome back, ${loggedUser}`}`</Box>
       <Box component="div" width="100%">
         <div className={styles.root}>
           <Stepper activeStep={activeStep} orientation="vertical">

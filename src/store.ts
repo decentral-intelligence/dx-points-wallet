@@ -5,24 +5,16 @@ import { settingsSlice } from "./features/settings/state";
 import { save, load } from "redux-localstorage-simple";
 
 const namespace = "dxp";
-const persistableStates = ["account", "settings"];
+const persistableStates = ["accounts", "settings"];
 
 const reducer = combineReducers({
   app: appSlice.reducer,
-  account: accountSlice.reducer,
+  accounts: accountSlice.reducer,
   settings: settingsSlice.reducer,
 });
 
-// @ts-ignore
-const rootReducer = (state, action) => {
-  if (action.type === "app/reset") {
-    state = undefined;
-  }
-  return reducer(state, action);
-};
-
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       save({ states: persistableStates, namespace })

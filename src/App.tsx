@@ -8,17 +8,13 @@ import { Account } from "./features/account/Account";
 import { Dashboard } from "./features/dashboard";
 import { AppInitializer } from "./app/@components/AppInitializer";
 import { useAppSelector } from "./hooks";
-import { RootState } from "./store";
-import { ThemeType } from "./app/types";
 import { LoginLayout } from "./app/@components/layout/LoginLayout";
 import { useLoggedUser } from "./app/hooks/useLoggedUser";
-
-const themeSelector = (s: RootState): ThemeType =>
-  s.settings[s.account._id]?.theme || "dark";
+import { themeSelector } from "./features/settings/state/selectors";
 
 export const App = () => {
-  const userTheme = useAppSelector(themeSelector);
   const loggedUser = useLoggedUser();
+  const userTheme = useAppSelector(themeSelector);
 
   const apolloClient = useMemo(() => {
     return new ApolloClient({

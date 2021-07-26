@@ -1,9 +1,8 @@
 import Typography from "@material-ui/core/Typography";
 import { Box, TextField } from "@material-ui/core";
-import { ChangeEvent, MouseEventHandler, useEffect, useState } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { useTheme } from "@material-ui/core/styles";
 import { KeyPairType } from "../../../../app/security/keyPairType";
-import { useLoggedUser } from "../../../../app/hooks/useLoggedUser";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import IconButton from "@material-ui/core/IconButton";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -24,7 +23,7 @@ const CopyAdornment: React.FC<CopyProps> = ({ onClick }) => (
 
 interface Props {
   alias: string;
-  onChange: (isValid: boolean) => void;
+  onChange: (keypair: KeyPairType, isValid: boolean) => void;
 }
 
 export const StepCreateAccount: React.FC<Props> = ({ alias, onChange }) => {
@@ -52,7 +51,7 @@ export const StepCreateAccount: React.FC<Props> = ({ alias, onChange }) => {
   }, []);
 
   useEffect(() => {
-    onChange(hasCopied.privateKey && hasCopied.publicKey);
+    onChange(keyPair, hasCopied.privateKey && hasCopied.publicKey);
   }, [hasCopied]);
 
   const handleClickCopy = (type: "privateKey" | "publicKey") => async () => {
@@ -72,13 +71,15 @@ export const StepCreateAccount: React.FC<Props> = ({ alias, onChange }) => {
   return (
     <form>
       <Typography variant="body2">
-        Congratz. This is your new DX Pointz account. Please copy the public and
-        private key and store these in a secure location. Eventually, you'll
-        need them to import your accounts on this or other devices.
+        These will be your account keys. Please copy the public and private key
+        and store these in a secure location. You'll need them to import your
+        accounts on this or other devices.
+      </Typography>
+      <Typography variant="caption" color="secondary">
+        It's important to store the keys in a secure location
       </Typography>
       <Box marginTop={theme.spacing(0.25)} textAlign="center">
-        <Typography variant="h4">{`Account ID: ${account}`}</Typography>
-        <Typography variant="subtitle2">{`Alias: ${alias}`}</Typography>
+        <Typography variant="h4">{`Alias: ${alias}`}</Typography>
       </Box>
       <Box
         marginTop={theme.spacing(0.25)}

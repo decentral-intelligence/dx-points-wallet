@@ -17,9 +17,8 @@ export const appSlice = createSlice({
     setLoggedUser: (state, action: PayloadAction<string>) => {
       state.loggedUser = action.payload;
     },
-    reset: () => {
-      // triggers a middleware
-      return initialState;
+    logout: (state, action: PayloadAction) => {
+      state.loggedUser = "";
     },
   },
 });

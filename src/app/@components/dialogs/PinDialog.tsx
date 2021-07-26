@@ -9,8 +9,8 @@ import Button from "@material-ui/core/Button";
 import { ChangeEvent, useState } from "react";
 import Typography from "@material-ui/core/Typography";
 import { useAppSelector } from "../../../hooks";
-import { accountSelector } from "../../selectors/accountSelector";
 import { decryptCryptoKeys } from "../../security/secureCryptoKeys";
+import { currentAccountSelector } from "../../selectors/accountSelector";
 
 interface Props {
   onClose: () => void;
@@ -21,7 +21,7 @@ interface Props {
 export const PinDialog: React.FC<Props> = ({ open, onClose, onCorrectPin }) => {
   const [pin, setPin] = useState("");
   const [invalidPin, setInvalidPin] = useState(false);
-  const account = useAppSelector(accountSelector);
+  const account = useAppSelector(currentAccountSelector);
 
   if (!account) return null;
 

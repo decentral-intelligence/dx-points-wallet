@@ -6,18 +6,23 @@ import { useHistory } from "react-router-dom";
 import { Page } from "../../app/@components/layout/Page";
 import { PinDialog } from "../../app/@components/dialogs/PinDialog";
 import { useAppDispatch, useAppSelector } from "../../hooks";
-import { accountSelector } from "../../app/selectors/accountSelector";
-import { appSlice } from "../../app/state";
+import { useCurrentAccount } from "../../app/hooks/useCurrentAccount";
+import { accountSlice } from "../account/state";
+import { settingsSlice } from "./state";
+import { currentAccountIdSelector } from "../../app/selectors/accountSelector";
 
 export const Settings = () => {
   const theme = useTheme();
   const [dialogOpen, setDialogOpen] = useState(false);
-  const account = useAppSelector(accountSelector);
+  const account = useCurrentAccount();
+  const userId = useAppSelector(currentAccountIdSelector);
   const history = useHistory();
   const dispatch = useAppDispatch();
 
-  const resetData = async (pin: string) => {
-    dispatch(appSlice.actions.reset());
+  const resetData = () => {
+    if (!userId) return;
+    dispatch(settingsSlice.actions.reset(userId));
+    dispatch(accountSlice.actions.reset(userId));
     history.replace("/");
   };
 
@@ -25,13 +30,13 @@ export const Settings = () => {
     if (account?._id) {
       setDialogOpen(true);
     } else {
-      await resetData("");
+      resetData();
     }
   };
 
   const handleCorrectPin = async (pin: string) => {
     setDialogOpen(false);
-    await resetData(pin);
+    resetData();
   };
 
   return (

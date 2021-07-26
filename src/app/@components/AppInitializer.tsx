@@ -1,10 +1,10 @@
 import { useLazyQuery } from "@apollo/client";
 import { useEffect } from "react";
 import { getAccountByIdQuery } from "../graphql/getAccountById.query";
-import { useAppDispatch, useAppSelector } from "../../hooks";
-import { accountSelector } from "../selectors/accountSelector";
+import { useAppDispatch } from "../../hooks";
 import { accountSlice } from "../../features/account/state";
 import { AccountData } from "../types/accountData";
+import { useCurrentAccount } from "../hooks/useCurrentAccount";
 
 export const AppInitializer = () => {
   const [getAccount, { data, stopPolling, error }] = useLazyQuery(
@@ -15,16 +15,15 @@ export const AppInitializer = () => {
       notifyOnNetworkStatusChange: true, // without that useEffect won't be triggered
     }
   );
-  const currentAccount = useAppSelector(accountSelector);
+  const currentAccount = useCurrentAccount();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (!currentAccount) return;
-    getAccount({ variables: { id: currentAccount._id } });
+    currentAccount && getAccount({ variables: { id: currentAccount._id } });
     return () => {
       stopPolling && stopPolling();
     };
-  }, []);
+  }, [currentAccount]);
 
   useEffect(() => {
     if (!(currentAccount && data?.account)) return;

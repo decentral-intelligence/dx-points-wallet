@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
 import GoogleLogin, {
@@ -6,15 +6,12 @@ import GoogleLogin, {
   GoogleLoginResponseOffline,
 } from "react-google-login";
 import { Page } from "./Page";
-import { Container, LinearProgress, Paper } from "@material-ui/core";
+import { Container, Paper } from "@material-ui/core";
 import Typography from "@material-ui/core/Typography";
 import Box from "@material-ui/core/Box";
-import { useAppDispatch, useAppSelector } from "../../../hooks";
-import { accountSelector } from "../../selectors/accountSelector";
-import { useHistory } from "react-router-dom";
-import { useLazyQuery } from "@apollo/client";
-import { getAccountByAliasQuery } from "../../graphql/getAccountByAlias.query";
+import { useAppDispatch } from "../../../hooks";
 import { appSlice } from "../../state";
+import { useLoggedUser } from "../../hooks/useLoggedUser";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,24 +46,8 @@ export const LoginLayout = () => {
   const styles = useStyles();
   const theme = useTheme();
   const [error, setError] = useState("");
-  const account = useAppSelector(accountSelector);
+  const loggedUser = useLoggedUser();
   const dispatch = useAppDispatch();
-  const [getAccount, { data, loading }] = useLazyQuery(getAccountByAliasQuery);
-  const history = useHistory();
-
-  useEffect(() => {
-    if (account) {
-      history.replace("/");
-    }
-  }, [account]);
-
-  useEffect(() => {
-    if (loading) return;
-
-    if (!data?.accountByAlias) {
-      history.replace("/account/create");
-    }
-  }, [loading, data]);
 
   const handleSuccessLogin = (
     response: GoogleLoginResponse | GoogleLoginResponseOffline
@@ -77,7 +58,6 @@ export const LoginLayout = () => {
       setError("Could not fetch the mandatory email address");
       return;
     }
-    getAccount({ variables: { alias: email } });
     dispatch(appSlice.actions.setLoggedUser(email));
   };
 
@@ -85,7 +65,7 @@ export const LoginLayout = () => {
     setError(error.message);
   };
 
-  if (account) return null;
+  if (loggedUser) return null;
 
   return (
     <Container classes={{ root: styles.root }}>
@@ -93,11 +73,6 @@ export const LoginLayout = () => {
       <Page>
         <div className={styles.content}>
           <Paper className={styles.paper}>
-            <LinearProgress
-              className={styles.loadingbar}
-              color="secondary"
-              hidden={!loading}
-            />
             <Box marginBottom={theme.spacing(1)}>
               <Typography variant="h4">Welcome to Dx Pointz</Typography>
             </Box>

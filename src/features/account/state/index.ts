@@ -1,18 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AccountData } from "../../../app/types/accountData";
-import { TransactionData } from "../../../app/types/transactionData";
+import { v3 as hash } from "murmurhash";
 
-const initialState = {} as AccountData;
+interface AccountDictionary {
+  [key: string]: AccountData | null;
+}
+
+const initialState: AccountDictionary = {};
 
 export const accountSlice = createSlice({
-  name: "account",
+  name: "accounts",
   initialState,
   reducers: {
     setAccount: (state, action: PayloadAction<AccountData>) => {
-      return action.payload;
+      const key = hash(action.payload._id);
+      state[key] = action.payload;
     },
-    setTransactions: (state, action: PayloadAction<TransactionData[]>) => {
-      state.transactions = action.payload;
+    reset: (state, action: PayloadAction<string>) => {
+      const key = hash(action.payload);
+      state[key] = null;
     },
   },
 });

@@ -14,6 +14,12 @@ export const settingsSlice = createSlice({
       const { userid, settings } = action.payload;
       state[userid] = settings;
     },
+    reset: (state, action: PayloadAction<string>) => {
+      const userid = action.payload;
+      state[userid] = {
+        theme: "dark",
+      };
+    },
   },
 });
 
