@@ -32,16 +32,12 @@ export const StepCreateAccount: React.FC<Props> = ({ alias, onChange }) => {
     privateKey: "",
     publicKey: "",
   });
-  const [account, setAccount] = useState("account");
   const [hasCopied, setHasCopied] = useState({
     privateKey: false,
     publicKey: false,
   });
 
   useEffect(() => {
-    console.log("createAccount");
-    console.log("creating account", alias);
-
     async function createAccount() {
       const keypair = await generateKeys();
       setKeyPair(keypair);
@@ -52,7 +48,7 @@ export const StepCreateAccount: React.FC<Props> = ({ alias, onChange }) => {
 
   useEffect(() => {
     onChange(keyPair, hasCopied.privateKey && hasCopied.publicKey);
-  }, [hasCopied]);
+  }, [hasCopied, keyPair, onChange]);
 
   const handleClickCopy = (type: "privateKey" | "publicKey") => async () => {
     try {

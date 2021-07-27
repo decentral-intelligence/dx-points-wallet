@@ -14,7 +14,6 @@ import { useAppLoadingState } from "../../../../app/hooks/useAppLoadingState";
 import { StepCreateAccount } from "../steps/StepCreateAccount";
 import { useLoggedUser } from "../../../../app/hooks/useLoggedUser";
 import { useMutation } from "@apollo/client";
-import { transferPointsMutation } from "../../../../app/graphql/transferPoints.mutation";
 import { createAccountMutation } from "../../../../app/graphql/createAccount.mutation";
 import { encryptCryptoKeys } from "../../../../app/security/secureCryptoKeys";
 import { accountSlice } from "../../state";

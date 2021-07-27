@@ -1,9 +1,12 @@
-import { Page } from "../../app/@components/layout/Page";
 import { useHistory } from "react-router-dom";
+import Box from "@material-ui/core/Box";
+import { Page } from "../../app/@components/layout/Page";
 import { BalanceCard } from "../../app/@components/BalanceCard";
 import { useCurrentAccount } from "../../app/hooks/useCurrentAccount";
+import { useTheme } from "@material-ui/core";
 
 export const Dashboard = () => {
+  const theme = useTheme();
   const history = useHistory();
   const account = useCurrentAccount();
 
@@ -14,7 +17,9 @@ export const Dashboard = () => {
 
   return (
     <Page>
-      <BalanceCard account={account} />
+      <Box marginBottom={theme.spacing(1)}>
+        <BalanceCard account={account} />
+      </Box>
     </Page>
   );
 };

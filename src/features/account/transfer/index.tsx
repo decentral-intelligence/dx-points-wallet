@@ -11,9 +11,8 @@ export const TransferView = () => {
   if (!account) return null;
   return (
     <Page>
-      <Box margin={theme.spacing(1)}>
-        <BalanceCard account={account} />
-      </Box>
+      <BalanceCard account={account} />
+      <Box margin={theme.spacing(1)} />
       <TransferForm account={account} />
     </Page>
   );

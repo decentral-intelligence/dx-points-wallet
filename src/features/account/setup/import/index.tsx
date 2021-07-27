@@ -92,7 +92,7 @@ export const AccountImport: React.FC = () => {
       text: `Your Account: ${_id} ${aliasTxt}`,
       error: false,
     });
-  }, [data]);
+  }, [data, loggedUser]);
 
   useEffect(() => {
     if (activeStep < StepIndices.AddPrivateKey) {

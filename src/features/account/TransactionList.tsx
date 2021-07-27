@@ -8,12 +8,31 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Paper from "@material-ui/core/Paper";
 import { AccountData } from "../../app/types/accountData";
+import { TransactionData } from "../../app/types/transactionData";
+import Chip from "@material-ui/core/Chip";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import RemoveCircleIcon from "@material-ui/icons/RemoveCircle";
 
 const useStyles = makeStyles({
   table: {
     minWidth: 650,
   },
 });
+
+interface AmountCellProps {
+  accountId: string;
+  tx: TransactionData;
+}
+
+const AmountCell: React.FC<AmountCellProps> = ({ accountId, tx }) => {
+  const Icon =
+    accountId === tx.sender._id ? (
+      <RemoveCircleIcon style={{ color: "red" }} />
+    ) : (
+      <AddCircleIcon style={{ color: "green" }} />
+    );
+  return <Chip icon={Icon} label={tx.amount} variant="outlined" />;
+};
 
 interface Props {
   account: AccountData;
@@ -49,7 +68,9 @@ export const TransactionList: React.FC<Props> = ({ account }) => {
               </TableCell>
               <TableCell>{t.sender.alias || t.sender._id}</TableCell>
               <TableCell>{t.recipient.alias || t.recipient._id}</TableCell>
-              <TableCell>{t.amount}</TableCell>
+              <TableCell>
+                <AmountCell accountId={account._id} tx={t} />
+              </TableCell>
               <TableCell>{t.message}</TableCell>
               <TableCell>{t.tags.join(",")}</TableCell>
             </TableRow>

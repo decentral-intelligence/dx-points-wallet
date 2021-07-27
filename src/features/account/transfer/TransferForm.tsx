@@ -130,7 +130,7 @@ export const TransferForm: React.FC<Props> = ({ account }) => {
 
   const getReceiverFieldHelperText = (): string => {
     if (!isAccountValid) {
-      return "❌ Unknown/Invalid Account";
+      return !formData.receiver.length ? "" : "❌ Unknown/Invalid Account";
     }
     const accountName =
       accountAliasData?.accountByAlias?._id || accountIdData?.account?.alias;

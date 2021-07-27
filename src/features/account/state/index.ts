@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AccountData } from "../../../app/types/accountData";
 import { v3 as hash } from "murmurhash";
-
+import sortBy from "lodash/sortBy";
 interface AccountDictionary {
   [key: string]: AccountData | null;
 }
@@ -13,8 +13,13 @@ export const accountSlice = createSlice({
   initialState,
   reducers: {
     setAccount: (state, action: PayloadAction<AccountData>) => {
-      const key = hash(action.payload._id);
-      state[key] = action.payload;
+      const account = action.payload;
+      account.transactions = sortBy(
+        account.transactions,
+        "timestamp"
+      ).reverse();
+      const key = hash(account._id);
+      state[key] = account;
     },
     reset: (state, action: PayloadAction<string>) => {
       const key = hash(action.payload);
