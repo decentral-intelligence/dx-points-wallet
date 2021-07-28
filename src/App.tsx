@@ -11,6 +11,7 @@ import { useAppSelector } from "./hooks";
 import { LoginLayout } from "./app/@components/layout/LoginLayout";
 import { useLoggedUser } from "./app/hooks/useLoggedUser";
 import { themeSelector } from "./features/settings/state/selectors";
+import { SnackbarProvider } from "notistack";
 
 export const App = () => {
   const loggedUser = useLoggedUser();
@@ -36,26 +37,31 @@ export const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <ApolloProvider client={apolloClient}>
-        <AppInitializer />
-        <Router>
-          {loggedUser ? (
-            <DefaultLayout>
-              <Switch>
-                <Route path="/settings">
-                  <Settings />
-                </Route>
-                <Route path="/account">
-                  <Account />
-                </Route>
-                <Route exact path="/">
-                  <Dashboard />
-                </Route>
-              </Switch>
-            </DefaultLayout>
-          ) : (
-            <LoginLayout />
-          )}
-        </Router>
+        <SnackbarProvider
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          maxSnack={3}
+        >
+          <AppInitializer />
+          <Router>
+            {loggedUser ? (
+              <DefaultLayout>
+                <Switch>
+                  <Route path="/settings">
+                    <Settings />
+                  </Route>
+                  <Route path="/account">
+                    <Account />
+                  </Route>
+                  <Route exact path="/">
+                    <Dashboard />
+                  </Route>
+                </Switch>
+              </DefaultLayout>
+            ) : (
+              <LoginLayout />
+            )}
+          </Router>
+        </SnackbarProvider>
       </ApolloProvider>
     </ThemeProvider>
   );

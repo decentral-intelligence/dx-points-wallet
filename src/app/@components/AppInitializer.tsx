@@ -26,7 +26,16 @@ export const AppInitializer = () => {
   }, [currentAccount]);
 
   useEffect(() => {
+    // User not found in backbone, but probably stored on machine
+    if (currentAccount && data?.account === null) {
+      console.log("resetting user...", currentAccount._id);
+      dispatch(accountSlice.actions.reset(currentAccount._id));
+    }
+  }, [currentAccount, data]);
+
+  useEffect(() => {
     if (!(currentAccount && data?.account)) return;
+
     const { balance, transactions } = data.account as AccountData;
     // if balance don't change, no change at all!
     if (balance !== currentAccount.balance) {

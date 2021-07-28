@@ -17,6 +17,8 @@ import { useMutation } from "@apollo/client";
 import { createAccountMutation } from "../../../../app/graphql/createAccount.mutation";
 import { encryptCryptoKeys } from "../../../../app/security/secureCryptoKeys";
 import { accountSlice } from "../../state";
+import { appSlice } from "../../../../app/state";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -53,6 +55,7 @@ export const AccountCreate = () => {
   const dispatch = useAppDispatch();
   const history = useHistory();
   const loggedUser = useLoggedUser();
+  const snackBar = useSnackbar();
   const [createAccount, { error, data }] = useMutation(createAccountMutation);
   const [, setAppLoading] = useAppLoadingState();
   const [activeStep, setActiveStep] = useState(0);
@@ -62,8 +65,6 @@ export const AccountCreate = () => {
     keys: { publicKey: "", privateKey: "" },
   });
   const [canAdvance, setCanAdvance] = useState(false);
-  // TODO: use setHint
-  const [hint, setHint] = useState({ text: "", error: false });
   const steps = getStepLabels();
 
   useEffect(() => {
@@ -76,6 +77,10 @@ export const AccountCreate = () => {
     }
 
     async function updateAccount() {
+      if (!data?.createAccount) {
+        return;
+      }
+
       const { balance, alias, transactions, _id } = data.createAccount;
       const securedKeys = await encryptCryptoKeys(formData.pin, formData.keys);
       dispatch(
@@ -92,10 +97,19 @@ export const AccountCreate = () => {
 
     updateAccount();
     setAppLoading(false);
+    snackBar.enqueueSnackbar("Yay! Welcome to Dx Pointz", {
+      variant: "success",
+    });
+    dispatch(appSlice.actions.showConfetti());
   }, [data]);
 
   useEffect(() => {
-    error && setAppLoading(false);
+    if (error) {
+      snackBar.enqueueSnackbar("Oh, snap! Something failed.", {
+        variant: "error",
+      });
+      setAppLoading(false);
+    }
   }, [error]);
 
   const handleNext = () => {
@@ -204,12 +218,6 @@ export const AccountCreate = () => {
             ))}
           </Stepper>
           <Paper square elevation={0} className={styles.resetContainer}>
-            <Typography
-              color={hint.error ? "error" : "textPrimary"}
-              align="center"
-            >
-              {hint.text}
-            </Typography>
             {activeStep === steps.length && (
               <>
                 <Typography>All steps completed - you're finished</Typography>
@@ -221,7 +229,6 @@ export const AccountCreate = () => {
                   color="primary"
                   onClick={handleCreate}
                   className={styles.button}
-                  disabled={hint.error}
                 >
                   Create
                 </Button>

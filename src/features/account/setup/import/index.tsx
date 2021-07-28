@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { useLazyQuery } from "@apollo/client";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import {
+  makeStyles,
+  Theme,
+  createStyles,
+  useTheme,
+} from "@material-ui/core/styles";
 import { Box, Step, StepContent, StepLabel } from "@material-ui/core";
 import Stepper from "@material-ui/core/Stepper";
 import Button from "@material-ui/core/Button";
@@ -17,6 +22,9 @@ import { useAppDispatch } from "../../../../hooks";
 import { actions } from "../../state";
 import { encryptCryptoKeys } from "../../../../app/security/secureCryptoKeys";
 import { useLoggedUser } from "../../../../app/hooks/useLoggedUser";
+import { appSlice } from "../../../../app/state";
+import { useSnackbar } from "notistack";
+import upperFirst from "lodash/upperFirst";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -52,7 +60,10 @@ const StepIndices = {
 export const AccountImport: React.FC = () => {
   const dispatch = useAppDispatch();
   const styles = useStyles();
+
+  const snackBar = useSnackbar();
   const history = useHistory();
+  const theme = useTheme();
   const loggedUser = useLoggedUser();
   const [getAccount, { data }] = useLazyQuery(getAccountByPublicKeyQuery);
   const [activeStep, setActiveStep] = useState(0);
@@ -66,6 +77,10 @@ export const AccountImport: React.FC = () => {
   const [canAdvance, setCanAdvance] = useState(false);
   const [hint, setHint] = useState({ text: "", error: false });
   const steps = getStepLabels();
+
+  const firstName = useMemo(() => {
+    return upperFirst(loggedUser ? loggedUser.replace(/([.@].*)/gi, "") : "");
+  }, [loggedUser]);
 
   useEffect(() => {
     if (!data?.accountByPublicKey) return;
@@ -95,11 +110,11 @@ export const AccountImport: React.FC = () => {
   }, [data, loggedUser]);
 
   useEffect(() => {
-    if (activeStep < StepIndices.AddPrivateKey) {
+    if (!formData.publicKey) {
       return;
     }
     getAccount({ variables: { publicKey: formData.publicKey } });
-  }, [activeStep, formData, getAccount]);
+  }, [formData, getAccount]);
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) =>
@@ -131,6 +146,11 @@ export const AccountImport: React.FC = () => {
         balance,
       })
     );
+    snackBar.enqueueSnackbar("Yay! Welcome back to Dx Pointz", {
+      variant: "success",
+    });
+    dispatch(appSlice.actions.showConfetti());
+
     history.replace("/account");
   };
 
@@ -193,7 +213,16 @@ export const AccountImport: React.FC = () => {
   return (
     <Page>
       <Typography variant="h2">Import Account</Typography>
-      <Box>{`Welcome back, ${loggedUser}`}`</Box>
+      <Box marginY={theme.spacing(0.25)}>
+        <Typography variant="h4">{`Welcome back, ${firstName}`}</Typography>
+        <Typography variant="body1">
+          Your data is not stored locally on this browser.
+        </Typography>
+        <Typography variant="body1">
+          Get your cryptographic keys you have received when you created your
+          account and follow the instructions
+        </Typography>
+      </Box>
       <Box component="div" width="100%">
         <div className={styles.root}>
           <Stepper activeStep={activeStep} orientation="vertical">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import AppBar from "@material-ui/core/AppBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Drawer from "@material-ui/core/Drawer";
@@ -9,18 +9,26 @@ import LogoutIcon from "@material-ui/icons/ExitToApp";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles, useTheme } from "@material-ui/core/styles";
+import ConfettiExplosion from "@reonomy/react-confetti-explosion";
 import { DrawerMenu } from "./DrawerMenu";
 import { LinearProgress } from "@material-ui/core";
 import { useAppLoadingState } from "../../hooks/useAppLoadingState";
 import { useGoogleLogout } from "react-google-login";
 import { appSlice } from "../../state";
-import { useAppDispatch } from "../../../hooks";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 
 const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    position: "relative",
+  },
+  confetti: {
+    overflow: "hidden",
+    position: "absolute",
+    width: "100vw",
+    height: "100vh",
   },
   drawer: {
     [theme.breakpoints.up("sm")]: {
@@ -74,8 +82,21 @@ export const DefaultLayout: React.FC<Props> = ({
   const classes = useStyles();
   const theme = useTheme();
   const dispatch = useAppDispatch();
+  const timeoutRef = useRef<NodeJS.Timeout>();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const showConfetti = useAppSelector((state) => state.app.confetti);
   const [isLoading] = useAppLoadingState();
+
+  useEffect(() => {
+    if (showConfetti) {
+      timeoutRef.current = setTimeout(() => {
+        dispatch(appSlice.actions.hideConfetti());
+      }, 4000);
+    }
+    return () => {
+      timeoutRef.current && clearTimeout(timeoutRef.current);
+    };
+  }, [showConfetti]);
 
   const handleSuccessfulLogout = () => {
     dispatch(appSlice.actions.logout());
@@ -93,6 +114,11 @@ export const DefaultLayout: React.FC<Props> = ({
   return (
     <div className={classes.root}>
       <CssBaseline />
+      {showConfetti && (
+        <div className={classes.confetti}>
+          <ConfettiExplosion floorHeight={2000} />
+        </div>
+      )}
       <AppBar position="fixed" className={classes.appBar}>
         <Toolbar>
           <IconButton
