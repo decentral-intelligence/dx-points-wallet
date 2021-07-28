@@ -41,7 +41,7 @@ export const AppInitializer = () => {
 
     const { balance, transactions } = data.account as AccountData;
 
-    // if balance doesn't change, we will do nothing!
+    // only do something when balance changed!
 
     const deltaBalance = balance - currentAccount.balance;
     if (deltaBalance > 0) {
