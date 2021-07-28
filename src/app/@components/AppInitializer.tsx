@@ -5,6 +5,8 @@ import { useAppDispatch } from "../../hooks";
 import { accountSlice } from "../../features/account/state";
 import { AccountData } from "../types/accountData";
 import { useCurrentAccount } from "../hooks/useCurrentAccount";
+import { useSnackbar } from "notistack";
+import { appSlice } from "../state";
 
 export const AppInitializer = () => {
   const [getAccount, { data, stopPolling, error }] = useLazyQuery(
@@ -17,6 +19,7 @@ export const AppInitializer = () => {
   );
   const currentAccount = useCurrentAccount();
   const dispatch = useAppDispatch();
+  const snackbar = useSnackbar();
 
   useEffect(() => {
     currentAccount && getAccount({ variables: { id: currentAccount._id } });
@@ -37,8 +40,18 @@ export const AppInitializer = () => {
     if (!(currentAccount && data?.account)) return;
 
     const { balance, transactions } = data.account as AccountData;
-    // if balance don't change, no change at all!
-    if (balance !== currentAccount.balance) {
+
+    // if balance doesn't change, we will do nothing!
+
+    const deltaBalance = balance - currentAccount.balance;
+    if (deltaBalance > 0) {
+      snackbar.enqueueSnackbar(`Yay! You got ${deltaBalance} points`, {
+        variant: "success",
+      });
+      dispatch(appSlice.actions.showConfetti());
+    }
+
+    if (deltaBalance !== 0) {
       dispatch(
         accountSlice.actions.setAccount({
           ...currentAccount,

@@ -83,16 +83,18 @@ export const AccountImport: React.FC = () => {
   }, [loggedUser]);
 
   useEffect(() => {
-    if (!data?.accountByPublicKey) return;
-
-    const { _id, alias } = data.accountByPublicKey;
-    if (!_id) {
+    if (!data) {
+      return;
+    }
+    if (!data.accountByPublicKey) {
       setHint({
         text: "No account exists for given public key!",
         error: true,
       });
       return;
     }
+
+    const { _id, alias } = data.accountByPublicKey;
 
     if (loggedUser !== alias) {
       setHint({
